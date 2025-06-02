@@ -1,6 +1,5 @@
 # 💰 Budget Tracker - Aplikasi Manajemen Keuangan Personal
-Syadza Puspadari Azhar - 122450072
-Tugas Besar Pemrograman Web 2025
+Syadza Puspadari Azhar - 122450072 - Tugas Besar Pemrograman Web 2025
 
 ## 📝 Deskripsi Aplikasi
 
