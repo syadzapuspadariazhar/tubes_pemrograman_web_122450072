@@ -1,4 +1,5 @@
 # 💰 Budget Tracker - Aplikasi Manajemen Keuangan Personal
+Syadza Puspadari Azhar - 122450072
 
 ## 📝 Deskripsi Aplikasi
 
