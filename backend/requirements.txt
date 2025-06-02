@@ -1,0 +1,8 @@
+pyramid
+waitress
+pyramid_tm
+SQLAlchemy
+pyramid_debugtoolbar
+pyramid_retry
+webtest
+PyJWT

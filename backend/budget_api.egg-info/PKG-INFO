@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: budget_api
+Version: 0.0.0
+Requires-Dist: pyramid
+Requires-Dist: sqlalchemy
+Requires-Dist: pyramid_tm
+Requires-Dist: waitress
+Requires-Dist: psycopg2-binary
+Dynamic: requires-dist

@@ -1,0 +1,239 @@
+import { createContext, useContext, useEffect, useState } from "react";
+import axios from "axios";
+
+const AppContext = createContext();
+const API = "http://localhost:6543/api";
+
+// Configure axios defaults
+axios.defaults.headers.common["Content-Type"] = "application/json";
+axios.defaults.timeout = 10000; // 10 seconds
+
+export const AppProvider = ({ children }) => {
+  const [transactions, setTransactions] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [backendStatus, setBackendStatus] = useState({ available: true, message: "" });
+
+  // ========== TRANSAKSI ==========
+  const fetchTransactions = async () => {
+    try {
+      const res = await axios.get(`${API}/transactions`);
+      setTransactions(res.data);
+      setBackendStatus({ available: true, message: "" });
+      return { success: true, data: res.data };
+    } catch (err) {
+      console.error("Gagal fetch transaksi:", err);
+      
+      if (err.code === 'ERR_NETWORK') {
+        console.warn("Koneksi ke server backend gagal. Pastikan server backend berjalan.");
+        setBackendStatus({ 
+          available: false, 
+          message: "Tidak dapat terhubung ke server backend. Pastikan server berjalan di http://localhost:6543"
+        });
+      }
+      
+      return { success: false, message: "Gagal mengambil data transaksi" };
+    }
+  };
+
+  const addTransaction = async (data) => {
+    try {
+      const response = await axios.post(`${API}/transactions`, data);
+      console.log("Transaction added:", response.data);
+      fetchTransactions();
+      return { success: true, message: "Transaksi berhasil ditambahkan" };
+    } catch (err) {
+      console.error("Gagal tambah transaksi:", err);
+      
+      let errorMessage = "Terjadi kesalahan saat menambahkan transaksi";
+      
+      if (err.code === 'ERR_NETWORK') {
+        errorMessage = "Tidak dapat terhubung ke server. Pastikan server backend berjalan.";
+        setBackendStatus({ available: false, message: errorMessage });
+        alert(errorMessage);
+      }
+      
+      return { success: false, message: errorMessage };
+    }
+  };
+
+  const updateTransaction = async (id, data) => {
+    try {
+      const response = await axios.put(`${API}/transactions/${id}`, data);
+      console.log("Transaction updated:", response.data);
+      fetchTransactions();
+      return { success: true, message: "Transaksi berhasil diupdate" };
+    } catch (err) {
+      console.error("Gagal update transaksi:", err);
+      
+      let errorMessage = "Terjadi kesalahan saat mengupdate transaksi";
+      
+      if (err.code === 'ERR_NETWORK') {
+        errorMessage = "Tidak dapat terhubung ke server. Pastikan server backend berjalan.";
+        setBackendStatus({ available: false, message: errorMessage });
+        alert(errorMessage);
+      }
+      
+      return { success: false, message: errorMessage };
+    }
+  };
+
+  const deleteTransaction = async (id) => {
+    try {
+      await axios.delete(`${API}/transactions/${id}`);
+      fetchTransactions();
+      return { success: true, message: "Transaksi berhasil dihapus" };
+    } catch (err) {
+      console.error("Gagal hapus transaksi:", err);
+      
+      let errorMessage = "Terjadi kesalahan saat menghapus transaksi";
+      
+      if (err.code === 'ERR_NETWORK') {
+        errorMessage = "Tidak dapat terhubung ke server. Pastikan server backend berjalan.";
+        setBackendStatus({ available: false, message: errorMessage });
+        alert(errorMessage);
+      }
+      
+      return { success: false, message: errorMessage };
+    }
+  };
+
+  // ========== KATEGORI ==========
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get(`${API}/categories`);
+      setCategories(res.data);
+      setBackendStatus({ available: true, message: "" });
+      return { success: true, data: res.data };
+    } catch (err) {
+      console.error("Gagal fetch kategori:", err);
+      
+      if (err.code === 'ERR_NETWORK') {
+        console.warn("Koneksi ke server backend gagal. Pastikan server backend berjalan.");
+        setBackendStatus({ 
+          available: false, 
+          message: "Tidak dapat terhubung ke server backend. Pastikan server berjalan di http://localhost:6543"
+        });
+      }
+      
+      return { success: false, message: "Gagal mengambil data kategori" };
+    }
+  };
+
+  const addCategory = async (data) => {
+    try {
+      console.log("Mengirim data kategori:", data);
+      const response = await axios.post(`${API}/categories`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log("Server response:", response.data);
+      fetchCategories();
+      return { success: true, message: "Kategori berhasil ditambahkan" };
+    } catch (err) {
+      console.error("Gagal tambah kategori:", err);
+      
+      let errorMessage = "Terjadi kesalahan saat menambahkan kategori";
+      
+      if (err.code === 'ERR_NETWORK') {
+        errorMessage = "Tidak dapat terhubung ke server. Pastikan server backend berjalan di http://localhost:6543";
+        setBackendStatus({ available: false, message: errorMessage });
+      } else if (err.response) {
+        // Server merespon dengan status error
+        errorMessage = `Error ${err.response.status}: ${err.response.data.message || "Terjadi kesalahan pada server"}`;
+      }
+      
+      alert(errorMessage);
+      return { success: false, message: errorMessage };
+    }
+  };
+
+  const updateCategory = async (id, data) => {
+    try {
+      const response = await axios.put(`${API}/categories/${id}`, data);
+      console.log("Update category response:", response.data);
+      fetchCategories();
+      return { success: true, message: "Kategori berhasil diupdate" };
+    } catch (err) {
+      console.error("Gagal update kategori:", err);
+      
+      let errorMessage = "Terjadi kesalahan saat mengupdate kategori";
+      
+      if (err.code === 'ERR_NETWORK') {
+        errorMessage = "Tidak dapat terhubung ke server. Pastikan server backend berjalan.";
+        setBackendStatus({ available: false, message: errorMessage });
+        alert(errorMessage);
+      }
+      
+      return { success: false, message: errorMessage };
+    }
+  };
+
+  const deleteCategory = async (id) => {
+    try {
+      await axios.delete(`${API}/categories/${id}`);
+      fetchCategories();
+      return { success: true, message: "Kategori berhasil dihapus" };
+    } catch (err) {
+      console.error("Gagal hapus kategori:", err);
+      
+      let errorMessage = "Terjadi kesalahan saat menghapus kategori";
+      
+      if (err.code === 'ERR_NETWORK') {
+        errorMessage = "Tidak dapat terhubung ke server. Pastikan server backend berjalan.";
+        setBackendStatus({ available: false, message: errorMessage });
+        alert(errorMessage);
+      }
+      
+      return { success: false, message: errorMessage };
+    }
+  };
+
+  // Check backend connectivity on mount
+  useEffect(() => {
+    const checkBackend = async () => {
+      try {
+        await axios.get(`${API}/categories`, { timeout: 5000 });
+        setBackendStatus({ available: true, message: "" });
+      } catch (err) {
+        console.error("Backend connectivity check failed:", err);
+        if (err.code === 'ERR_NETWORK') {
+          setBackendStatus({ 
+            available: false, 
+            message: "Server backend tidak dapat dijangkau. Pastikan server berjalan di http://localhost:6543"
+          });
+        }
+      }
+    };
+
+    checkBackend();
+  }, []);
+
+  // ========== AUTO FETCH SAAT MOUNT ==========
+  useEffect(() => {
+    fetchTransactions();
+    fetchCategories();
+  }, []);
+
+  return (
+    <AppContext.Provider
+      value={{
+        transactions,
+        categories,
+        backendStatus,
+        fetchTransactions,
+        fetchCategories,
+        addTransaction,
+        updateTransaction,
+        deleteTransaction,
+        addCategory,
+        updateCategory,
+        deleteCategory,
+      }}
+    >
+      {children}
+    </AppContext.Provider>
+  );
+};
+
+export const useAppContext = () => useContext(AppContext);
